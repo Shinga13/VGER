@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-export const activeTab = writable('Visual Glossary for Easy Reference');
+export const activeTab = writable('Visual Glossary Educational Repository');
 
 export const activeCard = writable('');
 
@@ -40,7 +40,9 @@ export const mobile_sidebar_active = writable(false);
 
 export const mobile_description = writable('');
 
-export const wiki_url = 'https://www.stowiki.net/wiki/';
+export const load_progress = writable(0);
+
+export const wiki_url = 'https://sto.fandom.com/wiki/';
 
 //export const icon_path = '/src/icons/';     // for dev
 
