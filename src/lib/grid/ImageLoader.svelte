@@ -1,7 +1,6 @@
 <script>
     export let src;
     export let alt;
-    export let index;
 
     import Intersector from './Intersector.svelte';
     import { load_progress, current_list } from '$lib/stores';
@@ -35,7 +34,7 @@
 </style>
 
 <Intersector once={once_var} let:intersecting={intersecting}>
-    {#if (intersecting && index < $load_progress + 50)}
+    {#if intersecting}
         <img {src} {alt} on:load={image_loaded} on:error={image_error} bind:this={this_image} referrerpolicy='no-referrer' loading='lazy'/>
         <!--<Image {alt} {src}/>-->
     {/if}
