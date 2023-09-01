@@ -1,10 +1,10 @@
 <script>
-
 import { 
     active_settings, activeTab, settings_env, settings_type, settings_av, 
     settings_space_slot, settings_ground_slot, settings_rarity, mobile_override, mobile, settings_search_desc
     } from '$lib/stores';
 import {equipment_types_ground, equipment_types_space, rarities} from '$lib/fetch/masterfetch';
+    import { onMount } from 'svelte';
 
 const links = [{name:'Website',link:'https://stobuilds.com/VGER'},{name:'STOCD',link:'https://github.com/STOCD'},{name:'STOBuilds Discord',link:'https://discord.gg/stobuilds'}]
 
@@ -145,7 +145,6 @@ function keyVarToggle(event, variable, state) {
         variable = state;
     }
 }
-
 </script>
 
 <!-- Settings Sidebar -- sliding in from the right on click -->
