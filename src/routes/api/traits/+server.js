@@ -8,21 +8,20 @@ than one day (same behavior if no parameter is supplied)
 
 
 import { 
-    data_iteration, fetch_cache, fetch_json, fresh_data_handler, get_filepath
+    data_iteration, fetch_cache, fetch_json, fresh_data_handler
 } from '$lib/fetch/masterfetch'
 import {
-    compensate_name, compensate_filename, compensate_wiki_description, image_suffix, wikihttp
+    compensate_name, compensate_url, compensate_wiki_description, image_path, image_suffix, wikihttp
 } from '$lib/fetch/constants'
 
 
 const data_folder_path = import.meta.env.VITE_DATA_FOLDER_PATH;
 const trait_file_path = data_folder_path + '/personal_traits.json';
-const redirect_file_path = data_folder_path + '/redirects.json';
 
 
 const trait_query =
     wikihttp
-    + '/Special:CargoExport?'
+    + 'Special:CargoExport?'
     + 'tables=Traits&'
     + 'fields=Traits._pageName%3DPage,'
     + 'Traits.name,'
@@ -97,13 +96,9 @@ export async function GET({url}) {
 
 async function create_data(version) {    
     // requests and saves cargo tables
-    const trait_json = await fetch_json(trait_query);
-    let redirects = await fetch_cache(redirect_file_path, true);
+    const trait_json = await fetch_json(trait_query)
     if (trait_json === null) {
         return null;
-    }
-    if (redirects === null || redirects === '') {
-        redirects = {};
     }
 
     let temp_data = {
@@ -196,13 +191,6 @@ async function create_data(version) {
                     availability_type = 'species';
                 }
 
-                let image_url = compensate_filename(current_page.name + image_suffix);
-                if (image_url in redirects) {
-                    image_url = redirects[image_url];
-                }
-                else {
-                    image_url = get_filepath(image_url);
-                }
                 temp_data.personal_traits.push({
                     'name': compensate_name(current_page['name']),
                     'type': type,
@@ -211,7 +199,7 @@ async function create_data(version) {
                     'desc': compensate_wiki_description(current_page.description),
                     'availability': availability,
                     'availability_type': availability_type,
-                    'image': image_url
+                    'image': image_path + compensate_url(current_page['name']) + image_suffix
                 });
             }
         }
