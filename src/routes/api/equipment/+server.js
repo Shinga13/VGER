@@ -8,22 +8,21 @@ than one day (same behavior if no parameter is supplied)
 
 
 import { 
-    data_iteration,  fetch_cache, fetch_json, fresh_data_handler, get_filepath
+    data_iteration,  fetch_cache, fetch_json, fresh_data_handler
 } from '$lib/fetch/masterfetch'
 import {
-    compensate_url, compensate_filename, compensate_wiki_description, equipment_types_ground,
-    equipment_types_space, image_suffix, wikihttp
+    compensate_url, compensate_wiki_description, equipment_types_ground,
+    equipment_types_space, image_path, image_suffix, wikihttp
 } from '$lib/fetch/constants'
 
 
 const data_folder_path = import.meta.env.VITE_DATA_FOLDER_PATH;
 const equip_file_path = data_folder_path + '/equipment.json';
-const redirect_file_path = data_folder_path + '/redirects.json';
 
 
 const item_query =
     wikihttp
-    + '/Special:CargoExport?'
+    + 'Special:CargoExport?'
     + 'tables=Infobox&'
     + 'fields=_pageName=Page,'
     + 'name,'
@@ -101,12 +100,8 @@ export async function GET({url}) {
 async function create_data(version) {    
     // requests and saves cargo tables
     const equipment_json = await fetch_json(item_query)
-    let redirects = await fetch_cache(redirect_file_path, true);
     if (equipment_json === null) {
         return null;
-    }
-    if (redirects === null || redirects === '') {
-        redirects = {};
     }
 
     let temp_data = {
@@ -171,14 +166,6 @@ async function create_data(version) {
                 description.text[i] = current_item['text' + i.toString()];
                 description2 += description.head[i] + description.subhead[i] + description.text[i]
             }
-            
-            let image_url = compensate_filename(current_name + image_suffix);
-            if (image_url in redirects) {
-                image_url = redirects[image_url];
-            }
-            else {
-                image_url = get_filepath(image_url);
-            }
 
             const current_obj = {
                 'name': compensate_wiki_description(current_name.replaceAll(':','')), 
@@ -188,7 +175,7 @@ async function create_data(version) {
                 'desc': description,
                 'desc2': description2,
                 'rarity': current_item.rarity == null ? '' : current_item.rarity.toLowerCase(),
-                'image': image_url
+                'image': image_path + compensate_url(current_name) + image_suffix
             };
             if (equipment_types_space.includes(current_item.type)) {
                 temp_data.space_equipment.push(current_obj);

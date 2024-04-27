@@ -8,21 +8,20 @@ than one day (same behavior if no parameter is supplied)
 
 
 import { 
-    data_iteration, fetch_cache, fetch_json, fresh_data_handler, get_filepath
+    data_iteration, fetch_cache, fetch_json, fresh_data_handler
 } from '$lib/fetch/masterfetch'
 import {
-    compensate_name, compensate_wiki_description, image_suffix, wikihttp, compensate_filename
+    compensate_name, compensate_url, compensate_wiki_description, image_path, image_suffix, wikihttp
 } from '$lib/fetch/constants'
 
 
 const data_folder_path = import.meta.env.VITE_DATA_FOLDER_PATH;
 const trait_file_path = data_folder_path + '/starship_traits.json';
-const redirect_file_path = data_folder_path + '/redirects.json';
 
 
 const starship_trait_query =
     wikihttp
-    + '/Special:CargoExport?'
+    + 'Special:CargoExport?'
     + 'tables=StarshipTraits&'
     + 'fields=StarshipTraits._pageName,'
     + 'StarshipTraits.name,'
@@ -37,7 +36,7 @@ const starship_trait_query =
 
 const starship_query =
     wikihttp
-    + '/Special:CargoExport?'
+    + 'Special:CargoExport?'
     + 'tables=Ships&'
     + 'fields=Ships._pageName,'
     + 'Ships.cost&'
@@ -109,12 +108,8 @@ async function create_data(version) {
     // requests and saves cargo tables
     const starship_trait_json = await fetch_json(starship_trait_query)
     const ships_json = await fetch_json(starship_query)
-    let redirects = await fetch_cache(redirect_file_path, true);
     if (starship_trait_json === null || ships_json === null) {
         return null;
-    }
-    if (redirects === null || redirects === '') {
-        redirects = {};
     }
 
     let temp_data = {
@@ -185,13 +180,6 @@ async function create_data(version) {
                     cost_filter.push('Mission / Exchange / Specialization')
                 }
             }
-            let image_url = compensate_filename(current_trait.name + image_suffix);
-            if (image_url in redirects) {
-                image_url = redirects[image_url];
-            }
-            else {
-                image_url = get_filepath(image_url);
-            }
             temp_data.starship_traits.push({
                 'name': compensate_name(current_trait.name),
                 'type': 'Starship Trait',
@@ -199,7 +187,7 @@ async function create_data(version) {
                 'cost': costs,
                 'cost_filter': cost_filter,
                 'desc': compensate_wiki_description(current_trait.detailed),
-                'image': image_url
+                'image': image_path + compensate_url(current_trait.name) + image_suffix
             });
         }
     }
